@@ -1,0 +1,25 @@
+@font-face {
+	font-family: 'Roboto';
+	src: url(./Oswald-VariableFont_wght.ttf);
+}
+
+:root {
+	font-family: Oswald;
+}
+
+b {
+	color: $accent;
+	font-weight: normal;
+}
+
+.q-page {
+	padding: 1rem;
+}
+
+.q-tab {
+	min-height: 2rem;
+}
+
+.q-toolbar {
+	gap: 0.5rem;
+}
