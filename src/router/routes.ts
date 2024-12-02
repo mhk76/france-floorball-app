@@ -6,7 +6,6 @@ const routes: RouteRecordRaw[] = [
 		component: () => import('layouts/MainLayout.vue'),
 		children: [
 			{ path: '', component: () => import('pages/IndexPage.vue') },
-			{ path: 'match/:id', component: () => import('pages/MatchPage.vue') },
 			{ path: 'leagues', component: () => import('pages/LeaguePage.vue') },
 			{
 				path: 'tournament/:id',
@@ -16,6 +15,7 @@ const routes: RouteRecordRaw[] = [
 				path: 'tournament/:tournamentId/match/:id',
 				component: () => import('pages/MatchPage.vue'),
 			},
+			{ path: 'match/:id', component: () => import('pages/MatchPage.vue') },
 		],
 	},
 

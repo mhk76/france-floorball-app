@@ -1,4 +1,4 @@
-export default interface EventInfo {
+export default interface MatchEventInfoApi {
 	id: number;
 	playerid1: number;
 	player1firstname: string;

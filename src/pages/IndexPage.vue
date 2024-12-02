@@ -1,12 +1,12 @@
 <template>
-	<q-page id="index-page">
-		<q-tabs v-model="selectedView" class="text-primary">
+	<q-page id="indexPage">
+		<q-tabs v-model="selectedView" class="textPrimary">
 			<q-tab
 				:name="TAB_LIVE"
 				icon="sym_o_live_tv"
 				:label="$t('match.live')"
 				:class="{
-					'text-secondary': liveMatches?.list_match.length ?? 0 > 0,
+					'text-secondary': liveMatches?.matches.length ?? 0 > 0,
 				}"
 			/>
 			<q-tab
@@ -24,19 +24,19 @@
 		<q-tab-panels v-model="selectedView" animated>
 			<q-tab-panel :name="TAB_LIVE">
 				<q-pull-to-refresh @refresh="onRefreshLive">
-					<match-list v-if="liveMatches" :data="liveMatches" />
+					<ListMatches v-if="liveMatches" :data="liveMatches" />
 				</q-pull-to-refresh>
 			</q-tab-panel>
 
 			<q-tab-panel :name="TAB_COMING">
 				<q-pull-to-refresh @refresh="onRefreshComing">
-					<match-list v-if="comingMatches" :data="comingMatches" />
+					<ListMatches v-if="comingMatches" :data="comingMatches" />
 				</q-pull-to-refresh>
 			</q-tab-panel>
 
 			<q-tab-panel :name="TAB_RECENT">
 				<q-pull-to-refresh @refresh="onRefreshRecent">
-					<match-list v-if="recentMatches" :data="recentMatches" />
+					<ListMatches v-if="recentMatches" :data="recentMatches" />
 				</q-pull-to-refresh>
 			</q-tab-panel>
 		</q-tab-panels>
@@ -44,18 +44,25 @@
 </template>
 
 <script setup lang="ts">
-import matchList from '../components/MatchList.vue';
+import ListMatches from '../components/ListMatches.vue';
 
 import { onBeforeMount, ref, watch } from 'vue';
-import { useGlobalStore } from 'src/stores/global';
+import { useSelectionStore } from 'src/stores/selectionStore';
+import { useGlobalStore } from 'src/stores/globalStore';
 import { useI18n } from 'vue-i18n';
-import MatchListInfo from 'src/interfaces/MatchListInfo';
-import API from 'src/enums/API';
-import MatchInfo from 'src/interfaces/MatchInfo';
+import {
+	useComingMatches,
+	useLiveMatches,
+	useRecentMatches,
+} from 'src/composables/useMatchLists';
+import MatchListInfo from 'src/models/MatchListInfo';
+import MatchInfo from 'src/models/MatchInfo';
 
 const POLLING_START_DELAY = 1 * 60 * 60 * 1000; // One hour
 const POLLING_INTERVAL = 60 * 1000; // One minute
+const SELECTED_VIEW_KEY = 'frontpage-view';
 
+const selection = useSelectionStore();
 const global = useGlobalStore();
 const i18n = useI18n();
 
@@ -79,23 +86,21 @@ let livePollingInterval: NodeJS.Timeout | undefined;
 type DoneFunction = () => void;
 
 function checkLivePolling() {
-	let hasLive = liveMatches.value?.list_match.length ?? 0 > 0;
+	let hasLive = liveMatches.value?.matches.length ?? 0 > 0;
 
 	if (!hasLive) {
 		const dates = Array.from(
-			comingMatches.value?.list_match
+			comingMatches.value?.matches
 				.reduce(
-					(dates: Set<string>, match: MatchInfo) => dates.add(match.date),
-					new Set<string>()
+					(dates: Set<Date>, match: MatchInfo) => dates.add(match.date),
+					new Set<Date>()
 				)
 				.keys() ?? []
 		);
 
 		const pollingStart = new Date().getTime() + POLLING_START_DELAY;
 
-		hasLive = dates.some(
-			(d) => global.date(d, '9:00').getTime() < pollingStart
-		);
+		hasLive = dates.some((date) => date.getTime() < pollingStart);
 	}
 
 	if (hasLive) {
@@ -107,19 +112,19 @@ function checkLivePolling() {
 }
 
 async function onPolling() {
-	const previousLive = liveMatches.value?.list_match ?? [];
+	const previousLive = liveMatches.value?.matches ?? [];
 
 	await onRefreshLive();
 
 	let refreshComing = false;
 
 	// Check started matches
-	liveMatches.value?.list_match.forEach((match) => {
+	liveMatches.value?.matches.forEach((match) => {
 		if (!previousLive.find((previous) => previous.id === match.id)) {
 			refreshComing = true;
 			global.notify({
 				message: i18n.t('match.matchStarted'),
-				caption: `${match.team_home_name} vs. ${match.team_away_name}`,
+				caption: `${match.homeTeamName} vs. ${match.awayTeamName}`,
 			});
 		}
 	});
@@ -133,14 +138,12 @@ async function onPolling() {
 
 	previousLive.forEach((previous) => {
 		if (
-			!liveMatches.value?.list_match.find(
-				(match) => match.id === previous.id
-			)
+			!liveMatches.value?.matches.find((match) => match.id === previous.id)
 		) {
 			refreshRecent = true;
 			global.notify({
 				message: i18n.t('match.matchEnded'),
-				caption: `${previous.team_home_name} vs. ${previous.team_away_name}`,
+				caption: `${previous.homeTeamName} vs. ${previous.awayTeamName}`,
 			});
 		}
 	});
@@ -151,12 +154,7 @@ async function onPolling() {
 }
 
 async function onRefreshLive(done?: DoneFunction) {
-	liveMatches.value = await global.loadData<MatchListInfo>(
-		'live-matches',
-		API.MATCH_LIST,
-		{ command: 'live' },
-		true
-	);
+	liveMatches.value = await useLiveMatches();
 
 	checkLivePolling();
 
@@ -166,12 +164,7 @@ async function onRefreshLive(done?: DoneFunction) {
 }
 
 async function onRefreshComing(done?: DoneFunction) {
-	comingMatches.value = await global.loadData<MatchListInfo>(
-		'coming-matches',
-		API.MATCH_LIST,
-		{ command: 'next' },
-		true
-	);
+	comingMatches.value = await useComingMatches();
 
 	checkLivePolling();
 
@@ -181,12 +174,7 @@ async function onRefreshComing(done?: DoneFunction) {
 }
 
 async function onRefreshRecent(done?: DoneFunction) {
-	recentMatches.value = await global.loadData<MatchListInfo>(
-		'recent-matches',
-		API.MATCH_LIST,
-		{ command: 'played' },
-		true
-	);
+	recentMatches.value = await useRecentMatches();
 
 	if (done) {
 		done();
@@ -200,24 +188,26 @@ onBeforeMount(async () => {
 
 	await onRefreshRecent();
 
-	if (global.selectedView === undefined) {
-		if (liveMatches.value!.list_match.length > 0) {
+	if (selection.get(SELECTED_VIEW_KEY) === undefined) {
+		if (liveMatches.value!.matches.length > 0) {
 			selectedView.value = TAB_LIVE;
 		} else if (
-			liveMatches.value!.list_match.length === 0 &&
-			comingMatches.value!.list_match.length === 0
+			liveMatches.value!.matches.length === 0 &&
+			comingMatches.value!.matches.length === 0
 		) {
 			selectedView.value = TAB_RECENT;
 		} else {
 			selectedView.value = TAB_COMING;
 		}
 	} else {
-		selectedView.value = global.selectedView;
+		selectedView.value = selection.get(SELECTED_VIEW_KEY) as string;
 	}
 });
 
 watch(
 	() => selectedView.value,
-	() => (global.selectedView = selectedView.value)
+	() => {
+		selection.set(SELECTED_VIEW_KEY, selectedView.value);
+	}
 );
 </script>

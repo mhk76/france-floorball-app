@@ -1,6 +1,6 @@
-import VenueInfo from './VenueInfo';
+import VenueInfoApi from './VenueInfoApi';
 
-export default interface MatchInfo {
+export default interface MatchInfoApi {
 	id: number;
 	active: boolean | null;
 	date: string;
@@ -33,7 +33,7 @@ export default interface MatchInfo {
 	bonus_def_home: number;
 	bonus_off_away: number;
 	bonus_def_away: number;
-	sporthall: VenueInfo | null;
+	sporthall: VenueInfoApi | null;
 	is_forfait_home: boolean;
 	is_forfait_away: boolean;
 	is_forfait_both: boolean;

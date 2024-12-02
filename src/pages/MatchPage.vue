@@ -1,14 +1,14 @@
 <template>
-	<q-page id="match-page" v-if="match">
+	<q-page id="matchPage" v-if="match">
 		<div class="date-info">
 			<span class="time">
-				{{ $d(global.date(match.date, match.time), 'datetime') }}
+				{{ $d(match.date, 'datetime') }}
 			</span>
-			<span v-if="match.is_live" class="live">
+			<span v-if="match.isLive" class="live">
 				<q-icon name="sym_o_live_tv" />
 				{{ $t('match.live') }}
 			</span>
-			<span v-else-if="match.is_played" class="history">
+			<span v-else-if="match.isFinished" class="history">
 				<q-icon name="sym_o_history" />
 				{{ $t('match.played') }}
 			</span>
@@ -16,27 +16,27 @@
 				<q-icon name="sym_o_scheduled" class="scheduled" />
 				{{ $t('match.scheduled') }}
 			</span>
-			<span class="round">
-				{{ match.round_name }}
+			<span class="tournament">
+				{{ match.tournamentName }}
 			</span>
 		</div>
 
 		<q-card class="team-score">
 			<div class="team">
-				<img :src="match.team_home_logo!" />
+				<img :src="match.homeTeamLogo!" />
 				<div class="name">
-					{{ match.team_home_name }}
+					{{ match.homeTeamName }}
 				</div>
-				<div class="score" v-if="match.is_played || match.is_started">
+				<div class="score" v-if="match.isFinished || match.isStarted">
 					{{ finalScore[0] }}
 				</div>
 			</div>
 			<div class="team">
-				<img :src="match.team_away_logo!" />
+				<img :src="match.awayTeamLogo!" />
 				<div class="name">
-					{{ match.team_away_name }}
+					{{ match.awayTeamName }}
 				</div>
-				<div class="score" v-if="match.is_played || match.is_started">
+				<div class="score" v-if="match.isFinished || match.isStarted">
 					{{ finalScore[1] }}
 				</div>
 			</div>
@@ -45,18 +45,17 @@
 		<div class="venue">
 			<q-icon name="sym_o_location_on" size="sm" />
 			{{ match.description }}
-			{{ match.sporthall?.name }}
+			{{ match.venueName }}
 		</div>
 
 		<div class="referees" v-if="referees?.length ?? 0 > 0">
 			<q-icon name="sym_o_sports" size="md" />
 			<span v-for="referee in referees" :key="referee.id">
-				{{ referee.lastname.toLocaleUpperCase() }}
-				{{ referee.firstname }}
+				{{ referee.name }}
 			</span>
 		</div>
 
-		<q-tabs v-model="selectedView" class="text-primary">
+		<q-tabs v-model="selectedView" class="textPrimary">
 			<q-tab
 				:name="TAB_EVENTS"
 				icon="sym_o_sports_hockey"
@@ -70,99 +69,54 @@
 		</q-tabs>
 
 		<q-tab-panels v-model="selectedView" animated>
-			<q-tab-panel :name="TAB_EVENTS">
-				<q-timeline class="events">
-					<template
-						v-for="(period, periodIndex) in periods"
-						:key="periodIndex"
-					>
-						<q-timeline-entry heading>
-							{{ $t(`period.${period[0]}`) }}
-						</q-timeline-entry>
-						<q-timeline-entry
-							v-for="(event, eventIndex) in period[1]"
-							:key="eventIndex"
-							:subtitle="`${
-								period[0] === 'PEN' ? '' : event.time.substring(3)
-							} ${$t(`eventType.${event.type}${event.code}`)}`"
-						>
-							<div class="score">
-								{{ event.runningscore }}
-							</div>
-							<img
-								v-if="event.teamid === match.team_home_id"
-								:src="match.team_home_logo ?? ''"
-								:alt="match.team_home_name"
-							/>
-							<img
-								v-if="event.teamid === match.team_away_id"
-								:src="match.team_away_logo ?? ''"
-								:alt="match.team_away_name"
-							/>
-							<div v-if="event.code === 'OG'" class="own-goal">
-								{{ $t('eventType.ownGoal') }}
-							</div>
-							<div v-else-if="event.type === 'Timeout'" class="timeout">
-								<template v-if="event.teamid === match.team_home_id">
-									{{ match.team_away_name }}
-								</template>
-								<template v-else>
-									{{ match.team_away_name }}
-								</template>
-							</div>
-							<div v-else-if="event.player1Name" class="players">
-								<div>
-									{{ event.player1lastname.toLocaleUpperCase() }}
-									{{ event.player1firstname }}
-								</div>
-								<div v-if="event.player2Name">
-									({{ event.player2lastname.toLocaleUpperCase() }}
-									{{ event.player2firstname }})
-								</div>
-							</div>
-							<div
-								v-if="event.penality !== '' && event.code !== 'MPS'"
-								class="penalty"
-							>
-								{{ $t(`penalties.${event.code}`) }}
-							</div>
-						</q-timeline-entry>
-						<q-timeline-entry
-							v-if="periodIndex < periods.length - 1 || match.is_played"
-							:subtitle="
-								period[0] === 'PEN' ? $t('period.endOfMatch') : '20:00'
-							"
-						>
-							{{ period[1].slice(-1)[0].runningscore }}
-							<q-icon name="sym_o_sports" size="lg" />
-							<span
-								v-if="periodIndex < periods.length - 1"
-								class="end-of-period"
-							>
-								{{ $t('period.endOfPeriod') }}
-							</span>
-							<span v-else class="end-of-match">
-								{{ $t('period.endOfMatch') }}
-							</span>
-						</q-timeline-entry>
-					</template>
-				</q-timeline>
+			<q-tab-panel :name="TAB_EVENTS" swipeable>
+				<ListMatchEvents
+					:match="match"
+					:events="events"
+					:periods="periods"
+				/>
 			</q-tab-panel>
-			<q-tab-panel :name="TAB_PLAYERS"> </q-tab-panel>
+			<q-tab-panel :name="TAB_PLAYERS" swipeable>
+				<ListPlayers
+					:team-name="match.homeTeamName"
+					:team-logo="match.homeTeamLogo"
+					:players="players?.get('home') ?? []"
+					:officials="officials?.get('home') ?? []"
+				/>
+				&nbsp;
+				<ListPlayers
+					:team-name="match.awayTeamName"
+					:team-logo="match.awayTeamLogo"
+					:players="players?.get('away') ?? []"
+					:officials="officials?.get('away') ?? []"
+				/>
+			</q-tab-panel>
 		</q-tab-panels>
 	</q-page>
 </template>
 
 <script setup lang="ts">
+import ListMatchEvents from '../components/ListMatchEvents.vue';
+import ListPlayers from '../components/ListPlayers.vue';
+
 import { computed, nextTick, onBeforeMount, onUnmounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useGlobalStore } from 'src/stores/global';
-import API from 'src/enums/API';
-import MatchInfo from 'src/interfaces/MatchInfo';
-import EventInfo from 'src/interfaces/EventInfo';
-import RefereeInfo from 'src/interfaces/RefereeInfo';
-import PlayerInfo from 'src/interfaces/PlayerInfo';
+import { useDataStore } from 'src/stores/dataStore';
+import { useGlobalStore } from 'src/stores/globalStore';
+import {
+	useMatch,
+	useMatchEvents,
+	useMatchOfficials,
+	useMatchPlayers,
+	useMatchReferees,
+} from 'src/composables/useMatches';
+import MatchInfo from 'src/models/MatchInfo';
+import MatchEventInfo from 'src/models/MatchEventInfo';
+import MatchRefereeInfo from 'src/models/MatchRefereeInfo';
+import MatchPlayerInfo from 'src/models/MatchPlayerInfo';
+import MatchOfficialInfo from 'src/models/MatchOfficialInfo';
+import { EVENT_TYPE } from 'src/definitions/EventType';
 
 const LIVE_POLLING_START = 5 * 60 * 1000; // five minutes
 const LIVE_INTERVAL = 10 * 1000; // 30 seconds
@@ -171,108 +125,64 @@ const TAB_PLAYERS = 'players';
 
 const route = useRoute();
 const i18n = useI18n();
+const data = useDataStore();
 const global = useGlobalStore();
 
 const matchId = parseInt(route.params.id as string, 10);
 const tournamentId = parseInt(route.params.tournamentId as string, 10);
 
 const match = ref<MatchInfo>();
-const events = ref<EventInfo[]>();
-const referees = ref<RefereeInfo[]>();
-const players = ref<PlayerInfo[]>();
+const events = ref<MatchEventInfo[]>([]);
+const referees = ref<MatchRefereeInfo[]>([]);
+const officials = ref<Map<string, MatchOfficialInfo[]>>();
+const players = ref<Map<string, MatchPlayerInfo[]>>();
 const selectedView = ref(TAB_EVENTS);
 
 let livePollingTimeout: NodeJS.Timeout | undefined;
 let livePollingInterval: NodeJS.Timeout | undefined;
 
-interface EventReduceItem {
-	periods: Map<string, EventInfo[]>;
-	goals: Map<number, number>;
-}
-
 const periods = computed(() =>
-	Array.from(
-		events.value
-			?.reduce(
-				(reduceItem: EventReduceItem, event: EventInfo) => {
-					if (event.period === 'PEN') {
-						if (event.code === 'PSAET') {
-							event.type = 'Goal';
-						}
-					} else if (event.type === 'Own Goal') {
-						if (event.teamid === match.value!.team_home_id) {
-							event.teamid = match.value!.team_away_id;
-						} else {
-							event.teamid = match.value!.team_home_id;
-						}
+	events.value?.reduce((periods, event) => {
+		if (periods.has(event.period)) {
+			const period = periods.get(event.period);
 
-						event.type = 'Goal';
-					}
+			period!.push(event);
+		} else {
+			periods.set(event.period, [event]);
+		}
 
-					if (event.type === 'Goal') {
-						reduceItem.goals.set(
-							event.teamid,
-							reduceItem.goals.get(event.teamid)! + 1
-						);
-					}
-
-					event.runningscore = `${reduceItem.goals.get(
-						match.value!.team_home_id
-					)} - ${reduceItem.goals.get(match.value!.team_away_id)}`;
-
-					if (reduceItem.periods.has(event.period)) {
-						const period = reduceItem.periods.get(event.period);
-
-						period!.push(event);
-
-						reduceItem;
-					} else {
-						reduceItem.periods.set(event.period, [event]);
-					}
-
-					return reduceItem;
-				},
-				{
-					periods: new Map<string, EventInfo[]>(),
-					goals: new Map<number, number>([
-						[match.value!.team_home_id, 0],
-						[match.value!.team_away_id, 0],
-					]),
-				} as EventReduceItem
-			)
-			.periods.entries() ?? []
-	)
+		return periods;
+	}, new Map<string, MatchEventInfo[]>())
 );
 
-const finalScore = computed(() =>
-	periods.value.length
-		? periods.value.slice(-1)[0][1].slice(-1)[0].runningscore.split(' - ')
-		: ['', '']
-);
+const finalScore = computed(() => {
+	const lastEvent = events.value.slice(-1)[0];
 
-const getEventDescription = (event: EventInfo) => {
-	if (event.type === 'Own Goal') {
-		return i18n.t('eventType.ownGoal');
-	} else if (event.type === 'Timeout') {
+	if (lastEvent) {
+		return [lastEvent.runningScoreHome, lastEvent.runningScoreAway];
+	} else {
+		return [0, 0];
+	}
+});
+
+const getEventDescription = (event: MatchEventInfo) => {
+	if (event.type === EVENT_TYPE.GOAL && event.code === 'OG') {
+		return i18n.t('eventType.OwnGoal');
+	} else if (event.type === EVENT_TYPE.TIMEOUT) {
 		return i18n.t('eventType.Timeout');
 	} else {
 		let description = [];
 
 		if (event.player1Name) {
-			description.push(
-				`${event.player1lastname.toLocaleUpperCase()} ${
-					event.player1firstname
-				}`
-			);
+			description.push(event.player1Name);
 		}
 		if (event.player2Name) {
-			description.push(
-				`${event.player2lastname.toLocaleUpperCase()} ${
-					event.player2firstname
-				}`
-			);
+			description.push(event.player2Name);
 		}
-		if (event.penality !== '' && event.code !== 'MPS') {
+		if (
+			event.penalty !== '' &&
+			event.type !== EVENT_TYPE.MISSED_PENALTY_SHOT
+		) {
 			description.push(i18n.t(`penalties.${event.code}`));
 		}
 
@@ -280,68 +190,81 @@ const getEventDescription = (event: EventInfo) => {
 	}
 };
 
-const getTeamLogo = (event: EventInfo) =>
-	event.teamid === match.value!.team_home_id
-		? match.value!.team_home_logo ?? undefined
-		: event.teamid === match.value!.team_away_id
-		? match.value!.team_away_logo ?? undefined
+const getTeamLogo = (event: MatchEventInfo) =>
+	event.teamId === match.value!.homeTeamId
+		? match.value!.homeTeamLogo ?? undefined
+		: event.teamId === match.value!.awayTeamId
+		? match.value!.awayTeamLogo ?? undefined
 		: undefined;
 
+const reducePlayerInfo = (
+	team: Map<string, MatchPlayerInfo[]>,
+	player: MatchPlayerInfo
+) => {
+	const teamType = player.teamId === match.value!.homeTeamId ? 'home' : 'away';
+	const playerList = team.get(teamType)!;
+
+	playerList.push(player);
+	playerList.sort((a: MatchPlayerInfo, b: MatchPlayerInfo) =>
+		a.isGoalkeeper > b.isGoalkeeper
+			? -1
+			: a.isGoalkeeper < b.isGoalkeeper
+			? 1
+			: a.number - b.number
+	);
+
+	return team;
+};
+
 async function updateData(noCache: boolean) {
-	match.value = await global.loadData<MatchInfo>(
-		`match-info-${matchId}`,
-		API.MATCH_INFO,
-		{ id: matchId, command: 'match', old: true },
-		noCache
+	match.value = await useMatch(matchId, noCache);
+
+	events.value = await useMatchEvents(match.value, noCache);
+
+	referees.value = await useMatchReferees(matchId, noCache);
+
+	officials.value = (await useMatchOfficials(matchId, noCache)).reduce(
+		(team: Map<string, MatchOfficialInfo[]>, official: MatchOfficialInfo) => {
+			const teamType =
+				official.teamId === match.value!.homeTeamId ? 'home' : 'away';
+
+			team.get(teamType)?.push(official);
+
+			return team;
+		},
+		new Map<string, MatchOfficialInfo[]>([
+			['home', []],
+			['away', []],
+		])
 	);
 
-	events.value = await global.loadData<EventInfo[]>(
-		`match-events-${matchId}`,
-		API.MATCH_INFO,
-		{ id: matchId, command: 'event', old: true },
-		noCache
+	players.value = (await useMatchPlayers(matchId, noCache)).reduce(
+		reducePlayerInfo,
+		new Map<string, MatchPlayerInfo[]>([
+			['home', []],
+			['away', []],
+		])
 	);
-
-	referees.value = (
-		await global.loadData<RefereeInfo[]>(
-			`match-referees-${matchId}`,
-			API.MATCH_INFO,
-			{ id: matchId, command: 'referee', old: true },
-			noCache
-		)
-	).filter((r) => r.id > 0);
-
-	players.value = (
-		await global.loadData<PlayerInfo[]>(
-			`match-referees-${matchId}`,
-			API.MATCH_INFO,
-			{ id: matchId, command: 'player', old: true },
-			noCache
-		)
-	).filter((r) => r.id > 0);
 }
 
 function startLivePolling() {
-	let isLive = match.value?.is_live ?? false;
+	let isLive = match.value?.isLive ?? false;
 
 	livePollingInterval = setInterval(async () => {
 		const lastEventsCount = events.value?.length ?? 0;
 
-		events.value = await global.loadData<EventInfo[]>(
-			`match-events-${matchId}`,
-			API.MATCH_INFO,
-			{ id: matchId, command: 'event', old: true },
-			true
-		);
+		// Poll new data
+		events.value = await useMatchEvents(match.value!, true);
 
+		// Show notification(s) for new event(s)
 		if ((events.value?.length ?? 0) > lastEventsCount) {
 			nextTick(() => {
 				window.scrollTo(0, document.body.scrollHeight);
 			});
 
 			events.value!.slice(lastEventsCount).forEach((event) => {
-				const eventInfo = `${event.time.substring(3)} ${
-					event.runningscore
+				const eventInfo = `${event.time} ${event.runningScoreHome}-${
+					event.runningScoreAway
 				} ${i18n.t(`eventType.${event.type}${event.code}`)}`;
 
 				global.notify({
@@ -352,15 +275,18 @@ function startLivePolling() {
 			});
 		}
 
+		// TODO: Update player data related to events
+
 		if (isLive) {
-			if (!match.value?.is_live) {
+			// TODO: Currently not polling for match ending, because of big data package
+			if (!match.value?.isLive) {
 				global.notify({
 					message: i18n.t('endOfMatch'),
 				});
 				clearInterval(livePollingInterval);
 				livePollingInterval = undefined;
 			}
-		} else if (!match.value?.is_live) {
+		} else if (!match.value?.isLive) {
 			isLive = true;
 		}
 	}, LIVE_INTERVAL);
@@ -371,20 +297,24 @@ onBeforeMount(async () => {
 
 	const matchData = match.value!;
 
-	if (matchData.is_live) {
+	if (matchData.isLive) {
+		// Match is live -> start polling
 		startLivePolling();
-	} else if (!matchData.is_played) {
-		const gameTime = global.date(matchData.date, matchData.time).getTime();
+	} else if (!matchData.isFinished) {
+		// Match hasn't been played yet
+		const gameTime = matchData.date.getTime();
 		const now = new Date().getTime();
 
 		if (gameTime - now <= LIVE_POLLING_START) {
+			// Match start is soon -> start polling
 			startLivePolling();
 		} else {
+			// Wait for match start
 			const expiration = gameTime - LIVE_POLLING_START;
 
-			global.setExpiration(`match-info-${matchId}`, expiration);
-			global.setExpiration(`match-events-${matchId}`, expiration);
-			global.setExpiration(`match-referees-${matchId}`, expiration);
+			data.setExpiration(`match-info-${matchId}`, expiration);
+			data.setExpiration(`match-events-${matchId}`, expiration);
+			data.setExpiration(`match-referees-${matchId}`, expiration);
 
 			livePollingTimeout = setTimeout(() => {
 				startLivePolling();
@@ -392,6 +322,7 @@ onBeforeMount(async () => {
 		}
 	}
 
+	// Build path for navigation bar
 	if (tournamentId) {
 		global.setPath([
 			{
@@ -399,19 +330,17 @@ onBeforeMount(async () => {
 				to: '/leagues',
 			},
 			{
-				label: matchData.round_name,
+				label: matchData.tournamentName,
 				to: `/tournament/${tournamentId}`,
 			},
 			{
 				label: i18n.t('route.match'),
-				to: `/tournament/${tournamentId}/match/${matchId}`,
 			},
 		]);
 	} else {
 		global.setPath([
 			{
 				label: i18n.t('route.match'),
-				to: `/match/${matchId}`,
 			},
 		]);
 	}
@@ -430,7 +359,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss">
-#match-page {
+#matchPage {
 	.date-info {
 		display: flex;
 		align-items: center;

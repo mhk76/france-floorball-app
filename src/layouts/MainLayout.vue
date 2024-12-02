@@ -2,14 +2,15 @@
 	<q-layout view="lHh Lpr lFf" id="main-layout">
 		<q-header elevated>
 			<q-toolbar>
-				<q-toolbar-title> <b>F</b>rance <b>F</b>loorball </q-toolbar-title>
+				<q-toolbar-title class="header">
+					<b>F</b>rance <b>F</b>loorball
+				</q-toolbar-title>
 				<q-btn
 					flat
 					icon="sym_o_trophy"
 					class="bg-secondary"
 					@click="$router.push(`/leagues`)"
 				/>
-				<q-btn flat icon="sym_o_groups" class="bg-secondary" />
 			</q-toolbar>
 		</q-header>
 
@@ -30,13 +31,18 @@
 </template>
 
 <script setup lang="ts">
-import { useGlobalStore } from 'src/stores/global';
+import { useGlobalStore } from 'src/stores/globalStore';
 
 const global = useGlobalStore();
 </script>
 
 <style lang="scss">
 #main-layout {
+	.header b {
+		color: $secondary;
+		font-weight: normal;
+	}
+
 	.q-breadcrumbs {
 		width: fit-content;
 		margin: 0.5rem 0.5rem 0 0.5rem;

@@ -1,11 +1,4 @@
 import { defineStore } from 'pinia';
-import { QNotifyCreateOptions, useQuasar } from 'quasar';
-import { ref } from 'vue';
-
-export interface PathItem {
-	label: string;
-	to: string;
-}
 
 interface CacheData {
 	expiration: number;
@@ -13,29 +6,14 @@ interface CacheData {
 }
 
 const CACHE_TIME = 60 * 60 * 1000; // one hour
-const quasar = useQuasar();
 
-export const useGlobalStore = defineStore('global', {
+export const useDataStore = defineStore('data', {
 	state: () => ({
-		path: ref<PathItem[]>([]),
 		cache: new Map<string, CacheData>(),
-		selectedDivision: undefined as number | undefined,
-		selectedSeason: undefined as number | undefined,
-		selectedView: undefined as string | undefined,
-		timezone: new Intl.DateTimeFormat('fr-FR', {
-			timeZone: 'Europe/Paris',
-			timeZoneName: 'longOffset',
-		})
-			.format(new Date())
-			.split(' UTC')[1],
 	}),
 
 	actions: {
-		date(date: string, time: string = '00:00:00'): Date {
-			return new Date(`${date}T${time}.000${this.timezone}`);
-		},
-
-		async loadData<T>(
+		async load<T>(
 			key: string,
 			url: string,
 			postData?: object,
@@ -84,11 +62,7 @@ export const useGlobalStore = defineStore('global', {
 			}
 		},
 
-		notify(options: QNotifyCreateOptions) {
-			quasar.notify(options);
-		},
-
-		setData(key: string, data: object) {
+		set(key: string, data: object) {
 			this.cache.set(key, {
 				expiration: new Date().getTime() + CACHE_TIME,
 				data: data,
@@ -101,10 +75,6 @@ export const useGlobalStore = defineStore('global', {
 			if (data) {
 				data.expiration = expiration;
 			}
-		},
-
-		setPath(pathItems: PathItem[]) {
-			this.path = pathItems;
 		},
 	},
 });

@@ -7,11 +7,6 @@
 	font-family: Oswald;
 }
 
-b {
-	color: $accent;
-	font-weight: normal;
-}
-
 .q-page {
 	padding: 1rem;
 }
@@ -22,4 +17,8 @@ b {
 
 .q-toolbar {
 	gap: 0.5rem;
+}
+
+.q-tab-panel {
+	padding: 0.2rem;
 }

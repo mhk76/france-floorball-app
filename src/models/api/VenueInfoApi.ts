@@ -1,4 +1,4 @@
-export default interface VenueInfo {
+export default interface VenueInfoApi {
 	id: number;
 	name: string;
 	streetaddress: string;

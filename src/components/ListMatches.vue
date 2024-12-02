@@ -1,7 +1,7 @@
 <template>
 	<div class="match-list">
 		<div v-for="(date, dateKey) in matchDates" :key="dateKey">
-			<div class="header">{{ $d(global.date(date)) }}</div>
+			<div class="header">{{ $d(date) }}</div>
 			<q-markup-table>
 				<q-tr
 					v-for="(match, timeKey) in matches.get(date)"
@@ -11,48 +11,48 @@
 					<q-td>
 						<div class="info">
 							<span class="time">
-								{{ $d(global.date(date, match.time), 'time') }}
+								{{ $d(match.date, 'time') }}
 							</span>
 							<span v-if="!hideDivision" class="division">
-								{{ match.round_name }}
+								{{ match.tournamentName }}
 							</span>
 							<span v-else class="venue">
-								{{ venues.get(match.sporthall_id)!.city }}
+								{{ venues.get(match.venueId)!.city }}
 							</span>
 						</div>
 						<div class="teams">
 							<div class="team">
 								<span class="score">
-									<template v-if="match.is_played || match.is_started">
-										{{ match.score_home }}
+									<template v-if="match.isFinished || match.isStarted">
+										{{ match.homeTeamScore }}
 									</template>
 									<template v-else>
 										<q-icon name="sym_o_schedule" />
 									</template>
 								</span>
 								<img
-									:src="match.team_home_logo ?? logos.get(match.club_home_id)!"
+									:src="match.homeTeamLogo ?? logos.get(match.homeTeamClubId)!"
 									width="24"
 								/>
 								<span class="name">
-									{{ match.team_home_name }}
+									{{ match.homeTeamName }}
 								</span>
 							</div>
 							<div class="team">
 								<span class="score">
-									<template v-if="match.is_played || match.is_started">
-										{{ match.score_away }}
+									<template v-if="match.isFinished || match.isStarted">
+										{{ match.awayTeamScore }}
 									</template>
 									<template v-else>
 										<q-icon name="sym_o_schedule" />
 									</template>
 								</span>
 								<img
-									:src="match.team_away_logo ?? logos.get(match.club_away_id)!"
+									:src="match.awayTeamLogo ?? logos.get(match.awayTeamClubId)!"
 									width="24"
 								/>
 								<span class="name">
-									{{ match.team_away_name }}
+									{{ match.awayTeamName }}
 								</span>
 							</div>
 						</div>
@@ -69,14 +69,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useGlobalStore } from 'src/stores/global';
-import MatchInfo from '../interfaces/MatchInfo';
-import LogoInfo from '../interfaces/LogoInfo';
-import MatchListInfo from '../interfaces/MatchListInfo';
-import VenueInfo from 'src/interfaces/VenueInfo';
+import MatchInfo from '../models/MatchInfo';
+import LogoInfo from '../models/LogoInfo';
+import MatchListInfo from '../models/MatchListInfo';
+import VenueInfo from 'src/models/VenueInfo';
 
 const router = useRouter();
-const global = useGlobalStore();
 
 const props = defineProps<{
 	data: MatchListInfo | undefined;
@@ -85,14 +83,15 @@ const props = defineProps<{
 }>();
 
 const matches = computed(() =>
-	(props.data as MatchListInfo).list_match.reduce(
-		(dates: Map<string, MatchInfo[]>, match: MatchInfo) => {
+	(props.data as MatchListInfo).matches.reduce(
+		(dates: Map<Date, MatchInfo[]>, match: MatchInfo) => {
 			if (dates.has(match.date)) {
 				const list = dates.get(match.date)!;
 
 				list.push(match);
-				list.sort((a: MatchInfo, b: MatchInfo) =>
-					a.time.localeCompare(b.time)
+				list.sort(
+					(a: MatchInfo, b: MatchInfo) =>
+						a.date.getTime() - b.date.getTime()
 				);
 
 				return dates;
@@ -100,12 +99,12 @@ const matches = computed(() =>
 				return dates.set(match.date, [match]);
 			}
 		},
-		new Map<string, MatchInfo[]>()
+		new Map<Date, MatchInfo[]>()
 	)
 );
 
 const logos = computed(() =>
-	(props.data as MatchListInfo).list_logo.reduce(
+	(props.data as MatchListInfo).logos.reduce(
 		(logos: Map<number, string>, logo: LogoInfo) =>
 			logos.set(logo.id, logo.logo),
 		new Map<number, string>()
@@ -113,7 +112,7 @@ const logos = computed(() =>
 );
 
 const venues = computed(() =>
-	(props.data as MatchListInfo).list_sporthall.reduce(
+	(props.data as MatchListInfo).venues.reduce(
 		(venues: Map<number, VenueInfo>, venue: VenueInfo) =>
 			venues.set(venue.id, venue),
 		new Map<number, VenueInfo>()
@@ -121,7 +120,7 @@ const venues = computed(() =>
 );
 
 const matchDates = computed(() =>
-	Array.from(matches.value.keys()).sort((a, b) => a.localeCompare(b))
+	Array.from(matches.value.keys()).sort((a, b) => a.getTime() - b.getTime())
 );
 
 function onGoToMatch(matchId: number) {

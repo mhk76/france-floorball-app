@@ -1,13 +1,9 @@
 <template>
 	<q-page id="league-page">
-		<q-tabs v-model="selectedSeason" class="text-primary">
-			<q-tab
-				v-for="season in seasons"
-				:name="season.id"
-				:label="season.name"
-				:key="season.id"
-			/>
-		</q-tabs>
+		<SelectSeason
+			v-model="selectedSeason"
+			:selection-key="LEAGUE_SEASON_KEY"
+		/>
 
 		<q-list id="tournament-list">
 			<q-item
@@ -35,55 +31,41 @@
 </template>
 
 <script lang="ts" setup>
-import { onBeforeMount, ref, watch } from 'vue';
-import { useGlobalStore } from 'src/stores/global';
-import { useI18n } from 'vue-i18n';
-import SeasonInfo from 'src/interfaces/SeasonInfo';
-import TournamentInfo from 'src/interfaces/TournamentInfo';
-import API from 'src/enums/API';
+import SelectSeason from 'src/components/SelectSeason.vue';
 
+import { onMounted, ref, watch } from 'vue';
+import { useSelectionStore } from 'src/stores/selectionStore';
+import { useGlobalStore } from 'src/stores/globalStore';
+import { useI18n } from 'vue-i18n';
+import { useTournaments } from 'src/composables/useTournaments';
+import TournamentInfo from 'src/models/TournamentInfo';
+
+const LEAGUE_SEASON_KEY = 'league-season';
+
+const selection = useSelectionStore();
 const global = useGlobalStore();
 const i18n = useI18n();
 
 global.setPath([
 	{
 		label: i18n.t('route.leagues'),
-		to: '/leagues',
 	},
 ]);
 
-const seasons = ref<SeasonInfo[]>();
 const tournaments = ref<TournamentInfo[]>();
-const selectedSeason = ref(0);
+const selectedSeason = ref<number>(0);
 
-onBeforeMount(async () => {
-	seasons.value = await global.loadData<SeasonInfo[]>(
-		'season-info',
-		API.SEASON_LIST
-	);
-
-	selectedSeason.value =
-		global.selectedSeason ??
-		(seasons.value.find((s) => s.iscurrent === 1) ?? { id: 0 }).id;
+onMounted(() => {
+	selectedSeason.value = selection.get(LEAGUE_SEASON_KEY, 0) as number;
 });
 
 watch(
 	() => selectedSeason.value,
 	async () => {
-		global.selectedSeason = selectedSeason.value;
-		global.selectedDivision = undefined;
+		selection.set(LEAGUE_SEASON_KEY, selectedSeason.value);
+		selection.set('league-division', undefined);
 
-		tournaments.value = (
-			await global.loadData<TournamentInfo[]>(
-				`season-tournaments-${selectedSeason.value}`,
-				API.TOURNAMENT_INFO,
-				{ seasonid: selectedSeason.value, command: 'getall' }
-			)
-		).sort((a, b) => a.id - b.id);
-
-		tournaments.value.forEach((t) =>
-			global.setData(`tournament-info-${t.id}`, t)
-		);
+		tournaments.value = await useTournaments(selectedSeason.value);
 	}
 );
 </script>

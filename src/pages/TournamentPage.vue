@@ -14,6 +14,7 @@
 			id="ranking"
 			v-if="
 				divisions.length > 0 &&
+				selectedDivision !== UNSELECTED &&
 				divisions[selectedDivision].type === DIVISION_TYPE.LEAGUE
 			"
 		>
@@ -80,25 +81,38 @@
 			</q-tr>
 		</q-markup-table>
 
-		<match-list :data="matches" :tournament-id="tournamentId" hide-division />
+		<ListMatches
+			:data="matches"
+			:tournament-id="tournamentId"
+			hide-division
+		/>
 	</q-page>
 </template>
 
 <script setup lang="ts">
-import matchList from '../components/MatchList.vue';
+import ListMatches from '../components/ListMatches.vue';
 
-import { onBeforeMount, ref, toRaw, watch } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useGlobalStore } from 'src/stores/global';
-import TournamentInfo from 'src/interfaces/TournamentInfo';
-import DivisionInfo from 'src/interfaces/DivisionInfo';
-import RankingInfo from 'src/interfaces/RankingInfo';
-import MatchListInfo from 'src/interfaces/MatchListInfo';
-import API from 'src/enums/API';
+import { useSelectionStore } from 'src/stores/selectionStore';
+import { useGlobalStore } from 'src/stores/globalStore';
+import {
+	useDivisionRankings,
+	useTournament,
+	useTournamentDivisions,
+} from 'src/composables/useTournaments';
+import { useDivisionMatches } from 'src/composables/useMatchLists';
+import DivisionInfo from 'src/models/DivisionInfo';
+import RankingInfo from 'src/models/RankingInfo';
+import MatchListInfo from 'src/models/MatchListInfo';
+
+const SELECTED_DIVISION_KEY = 'tournament-division';
+const UNSELECTED = -1;
 
 const route = useRoute();
 const i18n = useI18n();
+const selection = useSelectionStore();
 const global = useGlobalStore();
 
 enum DIVISION_TYPE {
@@ -110,13 +124,12 @@ const tournamentId = parseInt(route.params.id as string, 10);
 const divisions = ref<DivisionInfo[]>([]);
 const rankings = ref<RankingInfo[]>([]);
 const matches = ref<MatchListInfo>({
-	info: '',
-	list_logo: [],
-	list_match: [],
-	list_sporthall: [],
+	logos: [],
+	matches: [],
+	venues: [],
 });
 
-const selectedDivision = ref(-1);
+const selectedDivision = ref(UNSELECTED);
 const visibleInfo = ref<Record<number, boolean>>({});
 
 function onToggleVisibility(id: number) {
@@ -124,25 +137,15 @@ function onToggleVisibility(id: number) {
 }
 
 onBeforeMount(async () => {
-	const tournament = await global.loadData<TournamentInfo>(
-		`tournament-info-${tournamentId}`,
-		API.TOURNAMENT_INFO,
-		{ id: tournamentId, command: 'get' }
-	);
+	const tournament = await useTournament(tournamentId);
 
-	divisions.value = (
-		await global.loadData<DivisionInfo[]>(
-			`tournament-divisions-${tournamentId}`,
-			API.DIVISION_INFO,
-			{ tournament_id: tournamentId, command: 'getall' }
-		)
-	)
-		.map((d) => toRaw(d))
-		.filter((d) => d.reasonofcancel != null)
-		.sort((a, b) => a.comp_order - b.comp_order);
+	divisions.value = await useTournamentDivisions(tournamentId);
 
 	if (divisions.value.length > 0) {
-		selectedDivision.value = global.selectedDivision ?? 0;
+		selectedDivision.value = selection.get(
+			SELECTED_DIVISION_KEY,
+			0
+		) as number;
 	}
 
 	global.setPath([
@@ -152,7 +155,6 @@ onBeforeMount(async () => {
 		},
 		{
 			label: tournament.name,
-			to: `/tournament/${tournamentId}`,
 		},
 	]);
 });
@@ -160,21 +162,12 @@ onBeforeMount(async () => {
 watch(
 	() => selectedDivision.value,
 	async () => {
-		global.selectedDivision = selectedDivision.value;
+		selection.set(SELECTED_DIVISION_KEY, selectedDivision.value);
 
 		const id = divisions.value[selectedDivision.value].id;
 
-		rankings.value = await global.loadData<RankingInfo[]>(
-			`division-rankings-${id}`,
-			API.DIVISION_INFO,
-			{ id: id, command: 'get_ranking' }
-		);
-
-		matches.value = await global.loadData<MatchListInfo>(
-			`division-matches-${id}`,
-			API.MATCH_LIST,
-			{ id: id, command: 'round' }
-		);
+		rankings.value = await useDivisionRankings(id);
+		matches.value = await useDivisionMatches(id);
 	}
 );
 </script>

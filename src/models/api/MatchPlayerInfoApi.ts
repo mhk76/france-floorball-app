@@ -1,4 +1,4 @@
-export default interface PlayerInfo {
+export default interface MatchPlayerInfoApi {
 	id: number;
 	firstname: string;
 	lastname: string;
@@ -17,7 +17,7 @@ export default interface PlayerInfo {
 	number: number;
 	iscaptain: boolean;
 	isprivate: boolean;
-	photo: string | 'assets/default/playerW.jpg' | 'assets/default/playerM.jpg';
-	sex: 'Male' | 'Female';
+	photo: string | null;
+	sex: string;
 	name?: string;
 }

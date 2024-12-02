@@ -1,4 +1,4 @@
-export default interface RefereeInfo {
+export default interface MatchRefereeInfoApi {
 	info: string;
 	id: number;
 	firstname: string;
