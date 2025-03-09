@@ -116,7 +116,7 @@ import MatchEventInfo from 'src/models/MatchEventInfo';
 import MatchRefereeInfo from 'src/models/MatchRefereeInfo';
 import MatchPlayerInfo from 'src/models/MatchPlayerInfo';
 import MatchOfficialInfo from 'src/models/MatchOfficialInfo';
-import { EVENT_TYPE } from 'src/definitions/EventType';
+import { EVENT_TYPE } from 'src/enums/EVENT_TYPE';
 
 const LIVE_POLLING_START = 5 * 60 * 1000; // five minutes
 const LIVE_INTERVAL = 10 * 1000; // 30 seconds

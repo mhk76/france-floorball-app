@@ -4,7 +4,7 @@ import { useMatchEventInfoMapper } from './mappers/useMatchEventInfoMapper';
 import { useMatchRefereeInfoMapper } from './mappers/useMatchRefereeInfoMapper';
 import { useMatchOfficialInfoMapper } from './mappers/useMatchOfficialInfoMapper';
 import { useMatchPlayerInfoMapper } from './mappers/useMatchPlayerInfoMapper';
-import API from 'src/definitions/API';
+import API from 'src/enums/API';
 import MatchInfo from 'src/models/MatchInfo';
 import MatchEventInfo from 'src/models/MatchEventInfo';
 import MatchRefereeInfo from 'src/models/MatchRefereeInfo';
@@ -15,7 +15,7 @@ import MatchEventInfoApi from 'src/models/api/MatchEventInfoApi';
 import RefereeInfoApi from 'src/models/api/MatchRefereeInfoApi';
 import MatchOfficialInfoApi from 'src/models/api/MatchOficialInfoApi';
 import MatchPlayerInfoApi from 'src/models/api/MatchPlayerInfoApi';
-import { EVENT_TYPE } from 'src/definitions/EventType';
+import { EVENT_TYPE } from 'src/enums/EVENT_TYPE';
 
 const data = useDataStore();
 

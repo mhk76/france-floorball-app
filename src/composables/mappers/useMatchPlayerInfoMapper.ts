@@ -1,7 +1,7 @@
 import { useGlobalStore } from 'src/stores/globalStore';
 import MatchPlayerInfoApi from 'src/models/api/MatchPlayerInfoApi';
 import MatchPlayerInfo from 'src/models/MatchPlayerInfo';
-import GENDER from 'src/definitions/Gender';
+import GENDER from 'src/enums/GENDER';
 
 const global = useGlobalStore();
 

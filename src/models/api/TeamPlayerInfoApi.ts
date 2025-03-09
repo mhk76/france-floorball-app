@@ -1,0 +1,40 @@
+import PlayerStatisticsApi from './PlayerStatisticsApi';
+
+export interface TeamPlayerInfoApi {
+	id: number;
+	name: string;
+	firstname: string;
+	lastname: string;
+	birthplace: string;
+	birthdate: string;
+	sex: string;
+	email: string | null;
+	phone: string | null;
+	isprivate: number;
+	permissions: null;
+	admincurseasonid: null;
+	streetaddress: string | null;
+	postcode: string | null;
+	city: string | null;
+	documentcertificate: null;
+	datecertificate: null;
+	doctor: null;
+	approvalnumber: null;
+	haspassword: null;
+	photo: string;
+	nationality: null;
+	nationality2: null;
+	nationality3: null;
+	height: null;
+	grip_throw: null;
+	selectionNT: null;
+	selectionNTU19: null;
+	age: number;
+	licenseOptions: null;
+	nat1: string;
+	nat2: string;
+	nat3: string;
+	position: null;
+	number: number;
+	statistics: PlayerStatisticsApi;
+}

@@ -1,5 +1,5 @@
 import { useDataStore } from 'src/stores/dataStore';
-import API from 'src/definitions/API';
+import API from 'src/enums/API';
 import MatchListInfo from 'src/models/MatchListInfo';
 import MatchListInfoApi from 'src/models/api/MatchListInfoApi';
 import useMatchListInfoMapper from './mappers/useMatchListInfoMapper';

@@ -33,7 +33,7 @@
 <script lang="ts" setup>
 import SelectSeason from 'src/components/SelectSeason.vue';
 
-import { onMounted, ref, watch } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import { useSelectionStore } from 'src/stores/selectionStore';
 import { useGlobalStore } from 'src/stores/globalStore';
 import { useI18n } from 'vue-i18n';
@@ -52,10 +52,10 @@ global.setPath([
 	},
 ]);
 
-const tournaments = ref<TournamentInfo[]>();
+const tournaments = ref<TournamentInfo[]>([]);
 const selectedSeason = ref<number>(0);
 
-onMounted(() => {
+onBeforeMount(() => {
 	selectedSeason.value = selection.get(LEAGUE_SEASON_KEY, 0) as number;
 });
 

@@ -11,6 +11,12 @@
 					class="bg-secondary"
 					@click="$router.push(`/leagues`)"
 				/>
+				<q-btn
+					flat
+					icon="sym_o_groups"
+					class="bg-secondary"
+					@click="$router.push(`/clubs`)"
+				/>
 			</q-toolbar>
 		</q-header>
 

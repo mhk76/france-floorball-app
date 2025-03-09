@@ -1,7 +1,7 @@
 <template>
 	<q-card class="player-list">
-		<div class="team">
-			<span class="photo">
+		<div class="team" v-if="teamName">
+			<span class="photo" v-if="teamLogo">
 				<img v-if="teamLogo" :src="teamLogo" alt="groups" />
 				<q-icon v-else name="sym_o_groups" />
 			</span>
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import GENDER from 'src/definitions/Gender';
+import GENDER from 'src/enums/GENDER';
 import MatchOfficialInfo from 'src/models/MatchOfficialInfo';
 import MatchPlayerInfo from 'src/models/MatchPlayerInfo';
 
@@ -67,8 +67,8 @@ const icons = new Map<GENDER, string>([
 ]);
 
 defineProps<{
-	teamName: string;
-	teamLogo: string | undefined;
+	teamName?: string;
+	teamLogo?: string;
 	players: MatchPlayerInfo[];
 	officials: MatchOfficialInfo[];
 }>();

@@ -1,5 +1,5 @@
 import { useDataStore } from 'src/stores/dataStore';
-import API from 'src/definitions/API';
+import API from 'src/enums/API';
 import TournamentInfo from 'src/models/TournamentInfo';
 import DivisionInfo from 'src/models/DivisionInfo';
 import RankingInfo from 'src/models/RankingInfo';

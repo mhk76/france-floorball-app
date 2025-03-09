@@ -38,6 +38,6 @@ onBeforeMount(async () => {
 
 	selectedSeason.value =
 		(selection.get(props.selectionKey) as number) ??
-		(seasons.value.find((s) => s.iscurrent === 1) ?? { id: 0 }).id;
+		(seasons.value.find((s) => s.isCurrent) ?? { id: 0 }).id;
 });
 </script>

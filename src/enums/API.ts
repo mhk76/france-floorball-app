@@ -1,5 +1,7 @@
 enum API {
+	CLUB_TROPHIES = 'https://visu.floorball.fr/api/public_prizelist_get.php',
 	CLUB_LIST = 'https://visu.floorball.fr/api/public_clubs_getall.php',
+	CLUB_TEAMS_LIST = 'https://visu.floorball.fr/api/public_teams_byclubbyseason.php',
 	DIVISION_INFO = 'https://visu.floorball.fr/api/public_round_get.php',
 	GLOBAL_SEARCH = 'https://visu.floorball.fr/api/public_global_search.php',
 	MATCH_INFO = 'https://visu.floorball.fr/api/public_mt_match_get.php',

@@ -1,5 +1,5 @@
 import { useGlobalStore } from 'src/stores/globalStore';
-import { EVENT_TYPE } from 'src/definitions/EventType';
+import { EVENT_TYPE } from 'src/enums/EVENT_TYPE';
 import MatchEventInfoApi from 'src/models/api/MatchEventInfoApi';
 import MatchEventInfo from 'src/models/MatchEventInfo';
 import MatchInfo from 'src/models/MatchInfo';

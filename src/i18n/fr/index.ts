@@ -19,6 +19,21 @@ export default {
 		noMatches: 'Pas de match',
 		penaltyMinutes: '{0} min',
 	},
+	stats: {
+		trophies: 'Palmarès',
+		all: 'Tous',
+		jerseys: 'Maillots',
+		nAssists: '{0} passes',
+		nGoals: '{0} buts',
+		nMatches: '{0} matchs',
+		nMVP: '{0} fois MVP',
+		seasons: 'Saisons',
+	},
+	ranks: {
+		CHAMPIONSHIP_WINNER: 'Vainqueur du Championnat',
+		CHAMPIONSHIP_RUNNERUP: 'Finaliste du championnat',
+		CHAMPIONSHIP_3RD: '3ème du championnat',
+	},
 	period: {
 		'1st': '1ère tiers',
 		'2nd': '2ème tiers',

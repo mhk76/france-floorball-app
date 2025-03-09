@@ -11,8 +11,13 @@
 	padding: 1rem;
 }
 
-.q-tab {
-	min-height: 2rem;
+.q-tabs {
+	border-radius: 0.2rem;
+	background-color: rgba(0, 0, 255, 0.1);
+
+	.q-tab {
+		min-height: 2rem;
+	}
 }
 
 .q-toolbar {
@@ -21,4 +26,22 @@
 
 .q-tab-panel {
 	padding: 0.2rem;
+}
+
+.q-expansion-item {
+	margin-top: 0.5rem;
+	clear: both;
+
+	& > * > .q-item {
+		margin: 0;
+		padding: 0 0.5rem;
+		border-radius: 0.2rem;
+		line-height: 1rem;
+		background-color: rgba(0, 0, 255, 0.1);
+
+		.q-item__section--avatar {
+			padding: 0;
+			min-width: 2rem;
+		}
+	}
 }

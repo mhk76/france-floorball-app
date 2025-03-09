@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { EVENT_TYPE } from 'src/definitions/EventType';
+import { EVENT_TYPE } from 'src/enums/EVENT_TYPE';
 import MatchEventInfo from 'src/models/MatchEventInfo';
 import MatchInfo from 'src/models/MatchInfo';
 

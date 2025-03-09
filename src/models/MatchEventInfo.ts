@@ -1,4 +1,4 @@
-import { EVENT_TYPE } from 'src/definitions/EventType';
+import { EVENT_TYPE } from 'src/enums/EVENT_TYPE';
 
 export default interface MatchEventInfo {
 	id: number;

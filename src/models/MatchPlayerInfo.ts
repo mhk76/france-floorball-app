@@ -1,4 +1,4 @@
-import GENDER from 'src/definitions/Gender';
+import GENDER from 'src/enums/GENDER';
 
 export default interface MatchPlayerInfo {
 	id: number;
@@ -7,6 +7,7 @@ export default interface MatchPlayerInfo {
 	number: number;
 	isCaptain: boolean;
 	isMvp: boolean;
+	gamesPlayed?: number;
 	goals: number;
 	assists: number;
 	isGoalkeeper: boolean;
@@ -15,4 +16,5 @@ export default interface MatchPlayerInfo {
 	savePercent?: number;
 	photo?: string;
 	gender: GENDER;
+	nationality?: string;
 }

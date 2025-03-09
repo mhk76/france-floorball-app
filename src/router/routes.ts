@@ -16,6 +16,18 @@ const routes: RouteRecordRaw[] = [
 				component: () => import('pages/MatchPage.vue'),
 			},
 			{ path: 'match/:id', component: () => import('pages/MatchPage.vue') },
+			{
+				path: 'clubs',
+				component: () => import('pages/ClubListPage.vue'),
+			},
+			{
+				path: 'clubs/:id',
+				component: () => import('pages/ClubPage.vue'),
+			},
+			{
+				path: 'players/:id',
+				component: () => import('pages/PlayerPage.vue'),
+			},
 		],
 	},
 
