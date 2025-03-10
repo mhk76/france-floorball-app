@@ -8,6 +8,10 @@ export const useSelectionStore = defineStore('selection', {
 	}),
 
 	actions: {
+		clear(key: string) {
+			this.cache.delete(key);
+		},
+
 		get(key: string, defaultValue?: SelectionValue) {
 			return this.cache.get(key) ?? defaultValue;
 		},

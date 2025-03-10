@@ -13,7 +13,14 @@
 				<div class="name">
 					{{ player.name }}
 				</div>
-				<div>
+				<div class="day-of-birth">
+					{{
+						$t(
+							player.gender === GENDER.FEMALE
+								? 'stats.dayOfBirth_f'
+								: 'stats.dayOfBirth_m'
+						)
+					}}
 					{{ $d(player.birthDate) }}
 				</div>
 				<div v-if="stats.statistics.isGoalkeeper">
@@ -132,7 +139,7 @@ onBeforeMount(async () => {
 	player.value = await usePlayer(playerId);
 	trophies.value = await usePlayerTrophies(playerId);
 	stats.value = await usePlayerStatisticsInfo(playerId);
-	console.log(player.value);
+
 	global.setPath([
 		{
 			label: i18n.t('route.players'),
@@ -153,13 +160,28 @@ onBeforeMount(async () => {
 		display: flex;
 		align-items: flex-start;
 		gap: 0.5rem;
+		font-size: 90%;
+
+		.name {
+			font-variant: small-caps;
+			font-weight: 600;
+			font-size: 111%;
+		}
 
 		.photo {
-			padding: 0.5rem 0 0.1rem 0.5rem;
-			border: 1px solid rgba(0, 0, 0, 0.1);
+			margin: 0.5rem 0 0.1rem 0.5rem;
 
 			img {
-				height: 6rem;
+				max-width: 4rem;
+				max-height: 6.5rem;
+			}
+
+			i {
+				width: 4rem;
+				height: 6.5rem;
+				font-size: 5rem;
+				font-weight: bold;
+				color: rgba(0, 0, 0, 0.05);
 			}
 		}
 	}

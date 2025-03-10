@@ -82,6 +82,7 @@
 		</q-markup-table>
 
 		<ListMatches
+			:id="`tournament-${tournamentId}`"
 			:data="matches"
 			:tournament-id="tournamentId"
 			hide-division

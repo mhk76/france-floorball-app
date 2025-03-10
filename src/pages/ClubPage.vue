@@ -10,7 +10,7 @@
 			<q-item-section>
 				<q-item-label class="info" v-if="club.website">
 					<q-icon name="sym_o_home" />
-					<a :href="club.email" target="_blank">{{ club.website }}</a>
+					<a :href="club.website" target="_blank">{{ club.website }}</a>
 				</q-item-label>
 				<q-item-label class="info" v-if="club.phone">
 					<q-icon name="sym_o_call" />
@@ -41,7 +41,7 @@
 
 		<q-expansion-item
 			id="jerseys"
-			icon="sym_o_trophy"
+			icon="sym_o_laundry"
 			:label="$t('stats.jerseys')"
 		>
 			<div class="content">
@@ -181,6 +181,8 @@ const trophies = ref<Trophy[]>([]);
 const players = ref<MatchPlayerInfo[]>([]);
 const teams = ref<TeamInfo[]>([]);
 
+let lockTeamSelect = true;
+
 function onShowPlayer(player: MatchPlayerInfo) {
 	router.push(`/players/${player.id}`);
 }
@@ -208,7 +210,12 @@ watch(
 		selection.set(CLUB_SEASON_KEY, selectedSeason.value);
 
 		teams.value = await useClubTeams(selectedSeason.value, clubId);
-		selectedTeam.value = 0;
+		if (lockTeamSelect) {
+			selectedTeam.value = selection.get(CLUB_TEAM_KEY, 0) as number;
+			lockTeamSelect = false;
+		} else {
+			selectedTeam.value = 0;
+		}
 	}
 );
 

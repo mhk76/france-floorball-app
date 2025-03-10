@@ -25,6 +25,8 @@ function mapType(type: string, code: string, period: string): EVENT_TYPE {
 		return EVENT_TYPE.MISSED_PENALTY_SHOT;
 	} else if (type === 'Timeout') {
 		return EVENT_TYPE.TIMEOUT;
+	} else if (type === 'Goalie changed') {
+		return EVENT_TYPE.GOALIE_CHANGED;
 	} else {
 		return EVENT_TYPE.PENALTY;
 	}

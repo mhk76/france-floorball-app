@@ -37,16 +37,26 @@
 						{{ match.awayTeamName }}
 					</template>
 				</div>
+				<div
+					v-else-if="event.type === EVENT_TYPE.GOALIE_CHANGED"
+					class="goalie-change"
+				>
+					<div>
+						<q-icon name="sym_o_input_circle" />
+						{{ event.player1Name }}
+					</div>
+					<div>
+						<q-icon name="sym_o_output_circle" />
+						{{ event.player2Name }}
+					</div>
+				</div>
 				<div v-else-if="event.player1Name" class="players">
 					<div>
 						{{ event.player1Name }}
 					</div>
 					<div v-if="event.player2Id">({{ event.player2Name }})</div>
 				</div>
-				<div
-					v-if="event.penalty !== '' && event.code !== 'MPS'"
-					class="penalty"
-				>
+				<div v-if="event.type === EVENT_TYPE.PENALTY" class="penalty">
 					{{ $t(`penalties.${event.code}`) }}
 				</div>
 			</q-timeline-entry>

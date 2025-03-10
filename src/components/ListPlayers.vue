@@ -9,7 +9,12 @@
 				{{ teamName }}
 			</span>
 		</div>
-		<div v-for="(player, index) in players" :key="index" class="player">
+		<div
+			v-for="(player, index) in players"
+			:key="index"
+			class="player"
+			@click="onGoToPlayer(player.id)"
+		>
 			<span class="photo">
 				<img
 					v-if="player.photo"
@@ -59,6 +64,9 @@
 import GENDER from 'src/enums/GENDER';
 import MatchOfficialInfo from 'src/models/MatchOfficialInfo';
 import MatchPlayerInfo from 'src/models/MatchPlayerInfo';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const icons = new Map<GENDER, string>([
 	[GENDER.MALE, 'sym_o_male'],
@@ -72,6 +80,10 @@ defineProps<{
 	players: MatchPlayerInfo[];
 	officials: MatchOfficialInfo[];
 }>();
+
+function onGoToPlayer(playerId: number) {
+	router.push(`/players/${playerId}`);
+}
 </script>
 
 <style lang="scss">

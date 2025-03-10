@@ -5,7 +5,7 @@ export default interface PlayerInfo {
 	name: string;
 	birthDate: Date;
 	gender: GENDER;
-	photo: string;
+	photo: string | undefined;
 	nationality: string;
 	clubId: number;
 	clubName: string;

@@ -4,6 +4,7 @@ export enum EVENT_TYPE {
 	GOAL_POWERPLAY = 'goalPowerplay',
 	GOAL_SHORTHANDED = 'goalShorthanded',
 	GOAL_EQUAL_SHORTHANDED = 'goalEqualShorthanded',
+	GOALIE_CHANGED = 'goalieChanged',
 	PENALTY = 'penalty',
 	MISSED_PENALTY_SHOT = 'missedPenaltyShot',
 	TIMEOUT = 'timeout',

@@ -67,16 +67,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useSelectionStore } from 'src/stores/selectionStore';
 import MatchInfo from '../models/MatchInfo';
 import LogoInfo from '../models/LogoInfo';
 import MatchListInfo from '../models/MatchListInfo';
 import VenueInfo from 'src/models/VenueInfo';
 
+const MATCH_LIST_SCROLL = 'match-list-scroll';
+const MATCH_LIST_SCROLL_VALUE = 'match-list-scroll-value';
+
 const router = useRouter();
+const selection = useSelectionStore();
 
 const props = defineProps<{
+	id: string;
 	data: MatchListInfo | undefined;
 	hideDivision?: boolean;
 	tournamentId?: number;
@@ -124,12 +130,23 @@ const matchDates = computed(() =>
 );
 
 function onGoToMatch(matchId: number) {
+	selection.set(MATCH_LIST_SCROLL, props.id);
+	selection.set(MATCH_LIST_SCROLL_VALUE, document.documentElement.scrollTop);
+
 	if (props.tournamentId) {
 		router.push(`/tournament/${props.tournamentId}/match/${matchId}`);
 	} else {
 		router.push(`/match/${matchId}`);
 	}
 }
+
+onMounted(() => {
+	if (selection.get(MATCH_LIST_SCROLL) === props.id) {
+		setTimeout(() => {
+			window.scrollTo(0, selection.get(MATCH_LIST_SCROLL_VALUE) as number);
+		});
+	}
+});
 </script>
 
 <style lang="scss">

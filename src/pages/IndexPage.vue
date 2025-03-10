@@ -21,22 +21,34 @@
 			/>
 		</q-tabs>
 
-		<q-tab-panels v-model="selectedView" animated>
+		<q-tab-panels v-if="selectedView !== ''" v-model="selectedView" animated>
 			<q-tab-panel :name="TAB_LIVE">
 				<q-pull-to-refresh @refresh="onRefreshLive">
-					<ListMatches v-if="liveMatches" :data="liveMatches" />
+					<ListMatches
+						v-if="liveMatches"
+						:id="TAB_LIVE"
+						:data="liveMatches"
+					/>
 				</q-pull-to-refresh>
 			</q-tab-panel>
 
 			<q-tab-panel :name="TAB_COMING">
 				<q-pull-to-refresh @refresh="onRefreshComing">
-					<ListMatches v-if="comingMatches" :data="comingMatches" />
+					<ListMatches
+						v-if="comingMatches"
+						:id="TAB_COMING"
+						:data="comingMatches"
+					/>
 				</q-pull-to-refresh>
 			</q-tab-panel>
 
 			<q-tab-panel :name="TAB_RECENT">
 				<q-pull-to-refresh @refresh="onRefreshRecent">
-					<ListMatches v-if="recentMatches" :data="recentMatches" />
+					<ListMatches
+						v-if="recentMatches"
+						:id="TAB_RECENT"
+						:data="recentMatches"
+					/>
 				</q-pull-to-refresh>
 			</q-tab-panel>
 		</q-tab-panels>
@@ -76,12 +88,14 @@ defineOptions({
 	name: 'IndexPage',
 });
 
-const selectedView = ref(TAB_COMING);
+const selectedView = ref('');
 const liveMatches = ref<MatchListInfo | undefined>(undefined);
 const comingMatches = ref<MatchListInfo | undefined>(undefined);
 const recentMatches = ref<MatchListInfo | undefined>(undefined);
 
 let livePollingInterval: NodeJS.Timeout | undefined;
+
+let lockViewSelection = true;
 
 type DoneFunction = () => void;
 
@@ -182,13 +196,19 @@ async function onRefreshRecent(done?: DoneFunction) {
 }
 
 onBeforeMount(async () => {
+	const storedView = selection.get(SELECTED_VIEW_KEY);
+
+	if (storedView) {
+		selectedView.value = selection.get(SELECTED_VIEW_KEY) as string;
+	}
+
 	await onRefreshLive();
 
 	await onRefreshComing();
 
 	await onRefreshRecent();
 
-	if (selection.get(SELECTED_VIEW_KEY) === undefined) {
+	if (storedView === undefined) {
 		if (liveMatches.value!.matches.length > 0) {
 			selectedView.value = TAB_LIVE;
 		} else if (
@@ -199,8 +219,6 @@ onBeforeMount(async () => {
 		} else {
 			selectedView.value = TAB_COMING;
 		}
-	} else {
-		selectedView.value = selection.get(SELECTED_VIEW_KEY) as string;
 	}
 });
 
@@ -208,6 +226,13 @@ watch(
 	() => selectedView.value,
 	() => {
 		selection.set(SELECTED_VIEW_KEY, selectedView.value);
+
+		if (lockViewSelection) {
+			lockViewSelection = false;
+			selection.clear(TAB_COMING);
+			selection.clear(TAB_LIVE);
+			selection.clear(TAB_RECENT);
+		}
 	}
 );
 </script>
