@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="fr.floorball" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="fr.floorball" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>France Floorball</name>
-    <description>France Floorball matchs et statistiques</description>
-    <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
-        Apache Cordova Team
+    <description>Application de France Floorball. Les matchs, statistiques</description>
+    <author email="mikko.karhunen@iki.fi" href="https://floorball.fr">
+        France Floorball
     </author>
     <content src="index.html" />
     <allow-intent href="http://*/*" />
@@ -17,18 +17,18 @@
         <icon density="xhdpi" src="res/android/xhdpi.png" />
         <icon density="xxhdpi" src="res/android/xxhdpi.png" />
         <icon density="xxxhdpi" src="res/android/xxxhdpi.png" />
-        <splash density="land-ldpi" src="res/screen/android/splash-land-ldpi.png" />
-        <splash density="port-ldpi" src="res/screen/android/splash-port-ldpi.png" />
-        <splash density="land-mdpi" src="res/screen/android/splash-land-mdpi.png" />
-        <splash density="port-mdpi" src="res/screen/android/splash-port-mdpi.png" />
-        <splash density="land-hdpi" src="res/screen/android/splash-land-hdpi.png" />
-        <splash density="port-hdpi" src="res/screen/android/splash-port-hdpi.png" />
-        <splash density="land-xhdpi" src="res/screen/android/splash-land-xhdpi.png" />
-        <splash density="port-xhdpi" src="res/screen/android/splash-port-xhdpi.png" />
-        <splash density="land-xxhdpi" src="res/screen/android/splash-land-xxhdpi.png" />
-        <splash density="port-xxhdpi" src="res/screen/android/splash-port-xxhdpi.png" />
-        <splash density="land-xxxhdpi" src="res/screen/android/splash-land-xxxhdpi.png" />
-        <splash density="port-xxxhdpi" src="res/screen/android/splash-port-xxxhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-ldpi" src="res/screen/android/splash-land-ldpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-ldpi" src="res/screen/android/splash-port-ldpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-mdpi" src="res/screen/android/splash-land-mdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-mdpi" src="res/screen/android/splash-port-mdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-hdpi" src="res/screen/android/splash-land-hdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-hdpi" src="res/screen/android/splash-port-hdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-xhdpi" src="res/screen/android/splash-land-xhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-xhdpi" src="res/screen/android/splash-port-xhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-xxhdpi" src="res/screen/android/splash-land-xxhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-xxhdpi" src="res/screen/android/splash-port-xxhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="land-xxxhdpi" src="res/screen/android/splash-land-xxxhdpi.png" />
+        <AndroidWindowSplashScreenAnimatedIcon density="port-xxxhdpi" src="res/screen/android/splash-port-xxxhdpi.png" />
     </platform>
     <platform name="ios">
         <icon height="57" src="res/ios/icon.png" width="57" />
