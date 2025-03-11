@@ -1,0 +1,13 @@
+{
+  "name": "france-floorball-app",
+  "version": "1.0.0",
+  "description": "Application de France Floorball. Les matchs, statistiques",
+  "author": "Mikko Karhunen <mikko.karhunen@yahoo.fr>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}

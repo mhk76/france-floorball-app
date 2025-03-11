@@ -36,15 +36,15 @@
 				<div
 					v-if="stats.statistics.goals > 0 || stats.statistics.assists > 0"
 				>
-					{{ $t('stats.nGoals', [stats.statistics.goals]) }}
+					{{ global.t('stats.nGoals', [stats.statistics.goals]) }}
 					|
-					{{ $t('stats.nAssists', [stats.statistics.assists]) }}
+					{{ global.t('stats.nAssists', [stats.statistics.assists]) }}
 				</div>
 				<div>
-					{{ $t('stats.nMatches', [stats.statistics.gamesPlayed]) }}
+					{{ global.t('stats.nMatches', [stats.statistics.gamesPlayed]) }}
 					<template v-if="stats.statistics.mvpCount">
 						|
-						{{ $t('stats.nMVP', [stats.statistics.mvpCount]) }}
+						{{ global.t('stats.nMVP', [stats.statistics.mvpCount]) }}
 					</template>
 				</div>
 			</span>
@@ -89,15 +89,17 @@
 							season.statistics.assists > 0
 						"
 					>
-						{{ $t('stats.nGoals', [season.statistics.goals]) }}
+						{{ global.t('stats.nGoals', [season.statistics.goals]) }}
 						|
-						{{ $t('stats.nAssists', [season.statistics.assists]) }}
+						{{ global.t('stats.nAssists', [season.statistics.assists]) }}
 					</div>
 					<div>
-						{{ $t('stats.nMatches', [season.statistics.gamesPlayed]) }}
+						{{
+							global.t('stats.nMatches', [season.statistics.gamesPlayed])
+						}}
 						<template v-if="season.statistics.mvpCount">
 							|
-							{{ $t('stats.nMVP', [season.statistics.mvpCount]) }}
+							{{ global.t('stats.nMVP', [season.statistics.mvpCount]) }}
 						</template>
 					</div>
 				</span>

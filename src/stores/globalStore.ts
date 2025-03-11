@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { QNotifyCreateOptions, useQuasar } from 'quasar';
 import { ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 export interface PathItem {
 	label: string;
@@ -39,6 +40,15 @@ export const useGlobalStore = defineStore('global', {
 
 		setPath(pathItems: PathItem[]) {
 			this.path = pathItems;
+		},
+
+		t(key: string, values: (string | number)[]) {
+			return values.reduce(
+				(output: string, value: string | number, index) => {
+					return output.replace(`{${index}}`, value.toString());
+				},
+				useI18n().t(key)
+			);
 		},
 	},
 });

@@ -137,7 +137,7 @@
 							</template>
 						</span>
 					</span>
-					/ {{ $t('stats.nMatches', [player.gamesPlayed]) }}
+					/ {{ global.t('stats.nMatches', [player.gamesPlayed]) }}
 				</template>
 			</div>
 		</q-card>
