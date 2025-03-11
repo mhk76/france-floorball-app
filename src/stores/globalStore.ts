@@ -45,7 +45,7 @@ export const useGlobalStore = defineStore('global', {
 		t(key: string, values: (string | number)[]) {
 			return values.reduce(
 				(output: string, value: string | number, index) => {
-					return output.replace(`{${index}}`, value.toString());
+					return output.replace(`[${index}]`, value.toString());
 				},
 				useI18n().t(key)
 			);
